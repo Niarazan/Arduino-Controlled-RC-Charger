@@ -58,11 +58,12 @@ void loop(){
             Serial.println (" V "); 
   }
       elapsedTime= millis() - startTime;
-      microFarads = ((float)elapsedTime / 10000) * 1000; // calculate capacitance with the formula T = RC
       Serial.print ("TIME for Charging ");
       Serial.print( millis () - startTime);   // print the elapsed charging time 
       Serial.println(" mS    "); 
       
+      microFarads = ((float)elapsedTime / 10000) * 1000; // calculate capacitance with the formula T = RC
+
       Serial.print (microFarads); 
       Serial.println (" uF") ,  
       Serial.println ( "/////////////////////////////////////////" ); // indicator for charging completion

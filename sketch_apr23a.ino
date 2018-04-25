@@ -6,18 +6,17 @@
 #define ledDisChargingPin 5  // // LED for capacitor discharging
 
 unsigned long startTime;
+unsigned long elapsedTime;
+float microFarads;
 unsigned long dischargeStartTime;
 unsigned int readSensor;
+float CurrentVoltage;
 
 void  setup () {
 	pinMode (chargePin, OUTPUT );      // load set pin as output 
 	digitalWrite (chargePin, LOW );  
-        pinMode(ledChargingPin, OUTPUT);  // load LED Charging pin as output 
-        digitalWrite (ledChargingPin, LOW );
-        
+        pinMode(ledChargingPin, OUTPUT);  // load LED Charging pin as output       
         pinMode(ledDisChargingPin, OUTPUT);  // load LED DisCharging pin as output 
-        digitalWrite (ledDisChargingPin, LOW );
-        
 	Serial.begin (9600);              // initialize serial communication
 }
 
@@ -38,26 +37,34 @@ void loop(){
             //Serial.println (readSensor); 
 	}
         Serial.print ("TIME for Discharge ");
-		Serial.println ( millis () - dischargeStartTime); // print the elapsed discharging time 
+        Serial.print( millis () - dischargeStartTime); // print the elapsed discharging time 
+        Serial.println(" mS    "); 
   	pinMode (dischargePin, INPUT );             // set discharge pin as input (high impedance)
 
   	Serial.println ( "------------------------" ); // indicator for discharging completion
 
 	digitalWrite (chargePin, HIGH );   // charge the capacitor 
-	startTime = millis();            // start time 
+	           
 	readSensor = analogRead (analogPin);   // read sensor
         digitalWrite(ledDisChargingPin, LOW);
-        
-	while (readSensor <900) {        // 1016 is the expected value at 5 TC 
+        startTime = millis(); // start time 
+	while (readSensor < 648) {        // 648 is the expected value at 5 TC 
                 digitalWrite(ledChargingPin, HIGH);
                         
 	    readSensor = analogRead (analogPin);   // read the sensor value
-            //Serial.println (readSensor); 
+            CurrentVoltage = (float(analogRead(analogPin))/1024.00)*5.0; //calculate the current voltage of the capacitor while charging
+            Serial.print(CurrentVoltage);       // print the voltage to serial port
+            
+            Serial.println (" V "); 
   }
-  Serial.print ("TIME for Charging ");
-		Serial.println ( millis () - startTime);   // print the elapsed charging time 
-		//Serial.print ( "sensor data after charging: " ); 
-		//Serial.println (readSensor) ,  
-  Serial.println ( "/////////////////////////////////////////" ); // indicator for charging completion
+      elapsedTime= millis() - startTime;
+      microFarads = ((float)elapsedTime / 10000) * 1000; // calculate capacitance with the formula T = RC
+      Serial.print ("TIME for Charging ");
+      Serial.print( millis () - startTime);   // print the elapsed charging time 
+      Serial.println(" mS    "); 
+      
+      Serial.print (microFarads); 
+      Serial.println (" uF") ,  
+      Serial.println ( "/////////////////////////////////////////" ); // indicator for charging completion
 
 }
